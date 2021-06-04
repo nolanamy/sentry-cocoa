@@ -1,5 +1,6 @@
 #import "SentryCrashMachineContextWrapper.h"
 #import "SentryDefines.h"
+#import "SentryStacktrace.h"
 #import <Foundation/Foundation.h>
 
 @class SentryThread, SentryStacktraceBuilder;
@@ -17,6 +18,11 @@ SENTRY_NO_INIT
  * are not included. For more details checkout SentryStacktraceBuilder.
  */
 - (NSArray<SentryThread *> *)getCurrentThreads;
+
+/**
+ * Gets current threads and sets the supplied stacktrace for the current thread.
+ */
+- (NSArray<SentryThread *> *)getCurrentThreadsWithStacktrace:(SentryStacktrace *)stacktrace;
 
 @end
 

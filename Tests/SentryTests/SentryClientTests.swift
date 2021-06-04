@@ -248,6 +248,20 @@ class SentryClientTest: XCTestCase {
         }
     }
     
+    func testCaptureEventWithCustomStacktrace() {
+        let sut = fixture.getSut(configureOptions: { options in
+            options.attachStacktrace = true
+        })
+
+        let event = Event()
+        event.stacktrace = TestData.stacktrace
+        sut.capture(event: event)
+
+        assertLastSentEvent { actual in
+            XCTAssertEqual(event.stacktrace, actual.threads![0].stacktrace)
+        }
+    }
+    
     func testCaptureEventWithAttachStacktrace() {
         let event = Event(level: SentryLevel.fatal)
         event.message = fixture.message

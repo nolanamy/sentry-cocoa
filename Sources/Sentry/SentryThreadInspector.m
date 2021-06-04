@@ -26,6 +26,11 @@ SentryThreadInspector ()
 
 - (NSArray<SentryThread *> *)getCurrentThreads
 {
+    return [self getCurrentThreadsWithStacktrace:[self.stacktraceBuilder buildStacktraceForCurrentThread]];
+}
+
+- (NSArray<SentryThread *> *)getCurrentThreadsWithStacktrace:(SentryStacktrace *)stacktrace
+{
     NSMutableArray<SentryThread *> *threads = [NSMutableArray new];
 
     SentryCrashMC_NEW_CONTEXT(context);
@@ -45,7 +50,7 @@ SentryThreadInspector ()
 
         // For now we can only retrieve the stack trace of the current thread.
         if (isCurrent) {
-            sentryThread.stacktrace = [self.stacktraceBuilder buildStacktraceForCurrentThread];
+            sentryThread.stacktrace = stacktrace;
         }
 
         [threads addObject:sentryThread];

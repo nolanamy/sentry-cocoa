@@ -175,6 +175,16 @@ class SentrySDKTests: XCTestCase {
         
         assertEventCaptured(expectedScope: fixture.scope)
     }
+    
+    func testCaptureEventWithCustomStacktrace() {
+        givenSdkWithHub()
+        
+        let event = Event()
+        event.stacktrace = TestData.stacktrace
+        SentrySDK.capture(event: event)
+        
+        assertEventCaptured(expectedScope: fixture.scope, expectedEvent: event)
+    }
 
     func testCaptureEventWithScope() {
         givenSdkWithHub()
@@ -478,11 +488,15 @@ class SentrySDKTests: XCTestCase {
         }
     }
     
-    private func assertEventCaptured(expectedScope: Scope) {
+    private func assertEventCaptured(expectedScope: Scope, expectedEvent: Event) {
         let client = fixture.client
         XCTAssertEqual(1, client.captureEventWithScopeArguments.count)
-        XCTAssertEqual(fixture.event, client.captureEventWithScopeArguments.first?.event)
+        XCTAssertEqual(expectedEvent, client.captureEventWithScopeArguments.first?.event)
         XCTAssertEqual(expectedScope, client.captureEventWithScopeArguments.first?.scope)
+    }
+    
+    private func assertEventCaptured(expectedScope: Scope) {
+        assertEventCaptured(expectedScope: expectedScope, expectedEvent: fixture.event)
     }
     
     private func assertErrorCaptured(expectedScope: Scope) {
