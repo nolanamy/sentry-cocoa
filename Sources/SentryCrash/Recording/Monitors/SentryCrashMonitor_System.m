@@ -471,15 +471,6 @@ getBuildType()
     return "unknown";
 }
 
-static uint64_t
-getStorageSize()
-{
-    NSNumber *storageSize = [[[NSFileManager defaultManager]
-        attributesOfFileSystemForPath:NSHomeDirectory()
-                                error:nil] objectForKey:NSFileSystemSize];
-    return storageSize.unsignedLongLongValue;
-}
-
 // ============================================================================
 #pragma mark - API -
 // ============================================================================
@@ -556,7 +547,14 @@ initialize()
         g_systemData.parentProcessID = getppid();
         g_systemData.deviceAppHash = getDeviceAndAppHash();
         g_systemData.buildType = getBuildType();
-        g_systemData.storageSize = getStorageSize();
+        // Removed: g_systemData.storageSize = getStorageSize();
+        // getStorageSize() called NSFileSystemSize / attributesOfFileSystemForPath:
+        // — Apple DiskSpace required-reason API with no fitting reason for
+        // reading total storage as telemetry. The storageSize field on the
+        // event context still exists (initialised to 0) so downstream copies
+        // and the crash report's SentryCrashField_Storage keep working; the
+        // value shipped is now 0 instead of a real total-capacity number.
+        // See t-beba30 / t-f4ba67.
         g_systemData.memorySize = sentrycrashsysctl_uint64ForName("hw.memsize");
     }
 }
